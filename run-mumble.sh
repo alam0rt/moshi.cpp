@@ -14,9 +14,21 @@ ARIA2_FILES=(
     "${SCRIPT_DIR}/tools/Codes4Fun_moshika-q4_k-GGUF.txt"
 )
 
+# ── Parse --cuda flag ─────────────────────────────────────────────────────
+NIX_PACKAGE="default"
+EXTRA_ARGS=()
+for arg in "$@"; do
+    if [ "$arg" = "--cuda" ]; then
+        NIX_PACKAGE="cuda"
+    else
+        EXTRA_ARGS+=("$arg")
+    fi
+done
+set -- "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
+
 # ── Step 1: Build ──────────────────────────────────────────────────────────
-echo "▸ Building moshi.cpp..."
-nix build .#default
+echo "▸ Building moshi.cpp (#${NIX_PACKAGE})..."
+nix build ".#${NIX_PACKAGE}"
 
 # ── Step 2: Download models if needed ──────────────────────────────────────
 MODEL_PATH="${MODEL_DIR}/${MODEL_NAME}"
