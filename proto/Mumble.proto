@@ -9,7 +9,7 @@ syntax = "proto2";
 
 package MumbleProto;
 
-option optimize_for = SPEED;
+option optimize_for = LITE_RUNTIME;
 
 message Version {
 	optional uint32 version_v1 = 1;

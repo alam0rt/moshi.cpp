@@ -69,7 +69,7 @@ if(Protobuf_FOUND AND OpenSSL_FOUND AND Opus_FOUND)
         ggml ggml-base
         ${SentencePiece_LIBRARIES}
         OpenSSL::SSL OpenSSL::Crypto
-        protobuf::libprotobuf
+        protobuf::libprotobuf-lite
         ${OPUS_LIBRARIES}
     )
     target_include_directories(moshi-mumble PRIVATE

@@ -8,10 +8,12 @@
 
 #include <cstdint>
 #include <cstring>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <deque>
 #include <mutex>
+#include <condition_variable>
 #include <thread>
 #include <atomic>
 #include <chrono>
@@ -293,7 +295,8 @@ public:
             memset(frame_out, 0, MOSHI_FRAME_SIZE * sizeof(float));
             return false;
         }
-        memcpy(frame_out, rx_pcm_buf_.data(), MOSHI_FRAME_SIZE * sizeof(float));
+        std::copy(rx_pcm_buf_.begin(),
+                  rx_pcm_buf_.begin() + MOSHI_FRAME_SIZE, frame_out);
         rx_pcm_buf_.erase(rx_pcm_buf_.begin(),
                           rx_pcm_buf_.begin() + MOSHI_FRAME_SIZE);
         return true;
