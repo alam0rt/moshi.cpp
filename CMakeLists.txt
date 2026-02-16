@@ -41,14 +41,18 @@ function(setup_rpath target)
 endfunction()
 
 find_package(Threads REQUIRED)
-find_package(GGML REQUIRED)
 find_package(SentencePiece REQUIRED)
+
+# Vendored GGML — built as a subdirectory.
+# Pass through GGML options from the top-level build if the user sets them
+# (e.g. -DGGML_CUDA=ON -DGGML_VULKAN=ON -DGGML_BACKEND_DL=ON).
+add_subdirectory(vendor/ggml)
 
 option(MOSHI_BUILD_TOOLS    "moshi: build tools"          ${MOSHI_STANDALONE})
 
 add_library(moshi SHARED src/moshi.cpp src/json.cpp src/safetensor.cpp)
-target_link_libraries(moshi PRIVATE ${GGML_LIBRARIES} ${SentencePiece_LIBRARIES})
-target_include_directories(moshi PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS})
+target_link_libraries(moshi PRIVATE ggml ggml-base ${SentencePiece_LIBRARIES})
+target_include_directories(moshi PRIVATE ${SentencePiece_INCLUDE_DIRS})
 setup_rpath(moshi)
 
 if (MOSHI_BUILD_TOOLS)

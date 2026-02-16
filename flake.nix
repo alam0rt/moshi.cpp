@@ -28,8 +28,7 @@
             ffmpeg
             sentencepiece
 
-            # GGML (user must supply or build separately — paths set below)
-            # ggml
+            # GGML is vendored in vendor/ggml and built as a CMake subdirectory
 
             # Mumble client deps
             openssl
@@ -40,18 +39,15 @@
           shellHook = ''
             echo "moshi.cpp dev shell"
             echo ""
-            echo "New deps available: openssl, protobuf, libopus"
+            echo "GGML is vendored in vendor/ggml (no external paths needed)."
             echo ""
-            echo "You still need to set GGML paths if building from source:"
-            echo "  export GGML_INCLUDE_DIR=~/repos/ggml/include"
-            echo "  export GGML_LIBRARY_DIR=~/repos/ggml/build/src"
-            echo ""
-            echo "Then configure with:"
+            echo "Configure with:"
             echo "  cmake -B build -G Ninja \\"
-            echo "    -DGGML_INCLUDE_DIR=\$GGML_INCLUDE_DIR \\"
-            echo "    -DGGML_LIBRARY_DIR=\$GGML_LIBRARY_DIR \\"
             echo "    -DSentencePiece_INCLUDE_DIR=${pkgs.sentencepiece}/include \\"
             echo "    -DSentencePiece_LIBRARY_DIR=${pkgs.sentencepiece}/lib"
+            echo ""
+            echo "Optional GGML backends (pass to cmake):"
+            echo "  -DGGML_CUDA=ON  -DGGML_VULKAN=ON  -DGGML_BACKEND_DL=ON"
             echo ""
 
             # Make SentencePiece discoverable by the custom Find module

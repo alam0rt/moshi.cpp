@@ -90,6 +90,14 @@ Run text-to-speech:
 ./moshi-tts "Hello World!"
 ```
 
+Run the Mumble VoIP bot (requires a [Mumble server](https://www.mumble.info/)):
+```
+sudo apt install libssl-dev libprotobuf-dev protobuf-compiler libopus-dev
+./moshi-mumble --host localhost --username moshi-bot
+```
+
+See the [Mumble Bot](#mumble-bot) section below for more details.
+
 ### PersonaPlex
 
 Download the models ( about 5.0GB ):
@@ -359,7 +367,7 @@ A `flake.nix` is provided at the repository root for reproducible development:
 nix develop   # drops you into a shell with all deps
 ```
 
-You still need to build/supply GGML separately and set `GGML_INCLUDE_DIR` / `GGML_LIBRARY_DIR`.
+GGML is vendored in the repository, so no external GGML setup is needed.
 
 # Benchmarks
 

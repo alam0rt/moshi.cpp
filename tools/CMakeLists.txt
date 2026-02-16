@@ -3,38 +3,38 @@ find_package(SDL2 REQUIRED)
 find_package(FFmpeg REQUIRED COMPONENTS AVCODEC AVFILTER AVFORMAT AVUTIL SWRESAMPLE)
 
 add_executable(mimi-encode mimi-encode.cpp)
-target_link_libraries(mimi-encode PRIVATE moshi ${GGML_LIBRARIES} ${FFMPEG_LIBRARIES} ${SentencePiece_LIBRARIES})
-target_include_directories(mimi-encode PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(mimi-encode PRIVATE moshi ggml ggml-base ${FFMPEG_LIBRARIES} ${SentencePiece_LIBRARIES})
+target_include_directories(mimi-encode PRIVATE ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
 setup_rpath(mimi-encode)
 
 add_executable(mimi-decode mimi-decode.cpp)
-target_link_libraries(mimi-decode PRIVATE moshi ${GGML_LIBRARIES} ${FFMPEG_LIBRARIES} ${SentencePiece_LIBRARIES})
-target_include_directories(mimi-decode PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(mimi-decode PRIVATE moshi ggml ggml-base ${FFMPEG_LIBRARIES} ${SentencePiece_LIBRARIES})
+target_include_directories(mimi-decode PRIVATE ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
 setup_rpath(mimi-decode)
 
 add_executable(mimi-play mimi-play.cpp)
-target_link_libraries(mimi-play PRIVATE moshi ${GGML_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
-target_include_directories(mimi-play PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS})
+target_link_libraries(mimi-play PRIVATE moshi ggml ggml-base SDL2::SDL2 ${SentencePiece_LIBRARIES})
+target_include_directories(mimi-play PRIVATE ${SentencePiece_INCLUDE_DIRS})
 setup_rpath(mimi-play)
 
 add_executable(mimi-echo mimi-echo.cpp)
-target_link_libraries(mimi-echo PRIVATE moshi ${GGML_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
-target_include_directories(mimi-echo PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS})
+target_link_libraries(mimi-echo PRIVATE moshi ggml ggml-base SDL2::SDL2 ${SentencePiece_LIBRARIES})
+target_include_directories(mimi-echo PRIVATE ${SentencePiece_INCLUDE_DIRS})
 setup_rpath(mimi-echo)
 
 add_executable(moshi-tts moshi-tts.cpp)
-target_link_libraries(moshi-tts PRIVATE moshi ${GGML_LIBRARIES} ${FFMPEG_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
-target_include_directories(moshi-tts PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(moshi-tts PRIVATE moshi ggml ggml-base ${FFMPEG_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
+target_include_directories(moshi-tts PRIVATE ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
 setup_rpath(moshi-tts)
 
 add_executable(moshi-stt moshi-stt.cpp)
-target_link_libraries(moshi-stt PRIVATE moshi ${GGML_LIBRARIES} ${FFMPEG_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
-target_include_directories(moshi-stt PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(moshi-stt PRIVATE moshi ggml ggml-base ${FFMPEG_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
+target_include_directories(moshi-stt PRIVATE ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
 setup_rpath(moshi-stt)
 
 add_executable(moshi-sts moshi-sts.cpp)
-target_link_libraries(moshi-sts PRIVATE moshi ${GGML_LIBRARIES} ${FFMPEG_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
-target_include_directories(moshi-sts PRIVATE ${GGML_INCLUDE_DIRS} ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(moshi-sts PRIVATE moshi ggml ggml-base ${FFMPEG_LIBRARIES} SDL2::SDL2 ${SentencePiece_LIBRARIES})
+target_include_directories(moshi-sts PRIVATE ${SentencePiece_INCLUDE_DIRS} ${FFMPEG_INCLUDE_DIRS})
 set(CONFIG_FILES_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 file(GLOB CONFIG_FILES_TO_COPY
     RELATIVE ${CONFIG_FILES_SOURCE_DIR}
@@ -66,14 +66,13 @@ if(Protobuf_FOUND AND OpenSSL_FOUND AND Opus_FOUND)
     add_executable(moshi-mumble moshi-mumble.cpp ${MUMBLE_PROTO_SRCS} ${MUMBLE_PROTO_HDRS})
     target_link_libraries(moshi-mumble PRIVATE
         moshi
-        ${GGML_LIBRARIES}
+        ggml ggml-base
         ${SentencePiece_LIBRARIES}
         OpenSSL::SSL OpenSSL::Crypto
         protobuf::libprotobuf
         ${OPUS_LIBRARIES}
     )
     target_include_directories(moshi-mumble PRIVATE
-        ${GGML_INCLUDE_DIRS}
         ${SentencePiece_INCLUDE_DIRS}
         ${OPUS_INCLUDE_DIRS}
         ${CMAKE_CURRENT_BINARY_DIR}   # for generated Mumble.pb.h
