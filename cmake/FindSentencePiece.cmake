@@ -3,6 +3,16 @@
 #  SentencePiece_INCLUDE_DIRS - The SentencePiece include directories
 #  SentencePiece_LIBRARIES - The libraries needed to use SentencePiece
 
+# Fall back to environment variables when CMake variables are not set.
+# This lets `nix develop` export the paths and have cmake pick them up
+# without requiring explicit -D flags.
+if(NOT SentencePiece_INCLUDE_DIR AND DEFINED ENV{SentencePiece_INCLUDE_DIR})
+    set(SentencePiece_INCLUDE_DIR "$ENV{SentencePiece_INCLUDE_DIR}" CACHE PATH "SentencePiece include directory")
+endif()
+if(NOT SentencePiece_LIBRARY_DIR AND DEFINED ENV{SentencePiece_LIBRARY_DIR})
+    set(SentencePiece_LIBRARY_DIR "$ENV{SentencePiece_LIBRARY_DIR}" CACHE PATH "SentencePiece library directory")
+endif()
+
 # Search for the header file
 find_path(SentencePiece_INCLUDE_DIR
     NAMES sentencepiece_processor.h # Common header for SentencePiece
@@ -11,17 +21,7 @@ find_path(SentencePiece_INCLUDE_DIR
     DOC "SentencePiece include directory"
 )
 
-# --- Intelligent Library Name Search ---
-# if (WIN32)
-#     set(_sp_names sentencepiece.lib libsentencepiece.a sentencepiece)
-# elseif (APPLE)
-#     set(_sp_names libsentencepiece.dylib sentencepiece)
-# else() # Assume Linux/UNIX
-#     set(_sp_names libsentencepiece.so sentencepiece)
-# endif()
-
-# Now use the list of names we just generated
-#    NAMES ${_sp_names}
+# Search for the library
 find_library(SentencePiece_LIBRARY
     NAMES sentencepiece
     PATHS ${SentencePiece_LIBRARY_DIR}
