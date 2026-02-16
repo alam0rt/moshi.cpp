@@ -53,6 +53,37 @@ foreach(file ${CONFIG_FILES_TO_COPY})
 endforeach()
 setup_rpath(moshi-sts)
 
+# MARK: Mumble client
+find_package(Protobuf QUIET)
+find_package(OpenSSL QUIET)
+find_package(Opus QUIET)
+
+if(Protobuf_FOUND AND OpenSSL_FOUND AND Opus_FOUND)
+    # Generate C++ sources from Mumble.proto
+    protobuf_generate_cpp(MUMBLE_PROTO_SRCS MUMBLE_PROTO_HDRS
+        ${CMAKE_SOURCE_DIR}/proto/Mumble.proto)
+
+    add_executable(moshi-mumble moshi-mumble.cpp ${MUMBLE_PROTO_SRCS} ${MUMBLE_PROTO_HDRS})
+    target_link_libraries(moshi-mumble PRIVATE
+        moshi
+        ${GGML_LIBRARIES}
+        ${SentencePiece_LIBRARIES}
+        OpenSSL::SSL OpenSSL::Crypto
+        protobuf::libprotobuf
+        ${OPUS_LIBRARIES}
+    )
+    target_include_directories(moshi-mumble PRIVATE
+        ${GGML_INCLUDE_DIRS}
+        ${SentencePiece_INCLUDE_DIRS}
+        ${OPUS_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_BINARY_DIR}   # for generated Mumble.pb.h
+    )
+    setup_rpath(moshi-mumble)
+    message(STATUS "moshi-mumble: enabled (protobuf + openssl + opus found)")
+else()
+    message(STATUS "moshi-mumble: DISABLED (missing: protobuf=${Protobuf_FOUND} openssl=${OpenSSL_FOUND} opus=${Opus_FOUND})")
+endif()
+
 set(ARIA2_FILES_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(ARIA2_FILES_DEST_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 file(GLOB ARIA2_FILES_TO_COPY

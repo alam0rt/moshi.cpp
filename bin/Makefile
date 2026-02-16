@@ -1,5 +1,5 @@
 
-all: mimi-encode mimi-decode mimi-play mimi-echo moshi-tts moshi-stt
+all: mimi-encode mimi-decode mimi-play mimi-echo moshi-tts moshi-stt moshi-mumble
 
 include config.mk
 
@@ -34,6 +34,7 @@ MOSHI_HEADERS=\
 HEADERS=${MOSHI_HEADERS}\
  ../tools/ffmpeg_helpers.h\
  ../tools/sdl_helper.h\
+ ../tools/mumble_client.h\
  ../tools/util.h
 
 MOSHI_CFLAGS=-I../include
@@ -67,6 +68,16 @@ moshi-dl: ../tools/moshi-dl.cpp ${LIBMOSHI} ${HEADERS} ../tools/validate.h ${DL}
 
 mimi-%: ../tools/mimi-%.cpp ${LIBMOSHI} ${HEADERS} ${DL}
 	g++ -ggdb -O0 -o $@ ${TOOL_CFLAGS} $< ${TOOL_LIBS}
+
+# Mumble client needs protobuf generated sources, openssl, opus
+MUMBLE_PROTO_SRC=Mumble.pb.cc
+MUMBLE_PROTO_HDR=Mumble.pb.h
+
+${MUMBLE_PROTO_SRC} ${MUMBLE_PROTO_HDR}: ../proto/Mumble.proto
+	protoc --cpp_out=. $<
+
+moshi-mumble: ../tools/moshi-mumble.cpp ${MUMBLE_PROTO_SRC} ${LIBMOSHI} ${HEADERS} ${DL}
+	g++ -ggdb -O0 -o $@ ${TOOL_CFLAGS} -I. $< ${MUMBLE_PROTO_SRC} ${TOOL_LIBS} -lssl -lcrypto -lprotobuf -lopus
 
 moshi-%: ../tools/moshi-%.cpp ${LIBMOSHI} ${HEADERS} ${DL}
 	g++ -ggdb -O0 -o $@ ${TOOL_CFLAGS} $< ${TOOL_LIBS}
@@ -111,6 +122,12 @@ test-moshi-stt: moshi-stt
 debug-moshi-stt: moshi-stt
 	gdb --args ./moshi-stt -i ../audio_test.wav
 
+test-moshi-mumble: moshi-mumble
+	./moshi-mumble --host localhost --username moshi-bot
+
+debug-moshi-mumble: moshi-mumble
+	gdb --args ./moshi-mumble --host localhost --username moshi-bot
+
 clean:
 	rm -f ${DL_PRE}*.${DL_EXT}* mimi-* moshi-* test.*
 
@@ -130,5 +147,7 @@ clean:
  test-moshi-tts\
  debug-moshi-tts\
  test-moshi-stt\
- debug-moshi-stt
+ debug-moshi-stt\
+ test-moshi-mumble\
+ debug-moshi-mumble
 

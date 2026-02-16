@@ -47,6 +47,7 @@ There are multiple tools that demonstrate different components:
 * moshi-tts - demonstrates text inputs to audio outputs
 * moshi-stt - demonstrates audio inputs to text outputs
 * moshi-sts - demonstrates audio inputs to audio (and text) outputs
+* moshi-mumble - connects to a Mumble VoIP server as a speech-to-speech bot
 
 There are aria2c download scripts to make it easier to download tested models.
 
@@ -305,6 +306,60 @@ moshi-sts -g -q q4_k
 That will consume about 4gb of additional disk space, and takes several minutes to convert the model, but after the initial creation, starting moshi will take seconds.
 
 If you plan to use these models multiple times, it is recommened to use the `-g` option, it will take up more drive space but will load several times faster. You can experiment with quantization of the other models as well: `-q q8_0` `-q q4_k`.
+
+## Mumble Bot
+
+The `moshi-mumble` tool connects to a [Mumble](https://www.mumble.info/) VoIP server as a bot. Other users in the channel can talk to moshi and hear its responses in real-time.
+
+### Additional Build Dependencies
+
+* **OpenSSL** – TLS for the Mumble control channel
+* **protobuf** – Mumble protocol message serialization
+* **libopus** – Opus audio codec
+
+On Ubuntu:
+```
+sudo apt install libssl-dev libprotobuf-dev protobuf-compiler libopus-dev
+```
+
+Or use the provided Nix flake:
+```
+nix develop
+```
+
+The `moshi-mumble` target is built automatically when CMake detects all three dependencies. If any are missing, the build will skip it with a status message.
+
+### Usage
+
+Connect to a local Mumble server:
+```
+./moshi-mumble --host localhost --username moshi-bot
+```
+
+Connect to a remote server with a password and join a specific channel:
+```
+./moshi-mumble --host mumble.example.com --password secret --channel "General" --username moshi-bot
+```
+
+All the standard model options work (`-m`, `-g`, `-q q4_k`, `-c`, `-t`, `-d`, etc.):
+```
+./moshi-mumble --host localhost -g -q q4_k -c 2000
+```
+
+See `./moshi-mumble -h` for the full list of options.
+
+### How It Works
+
+The bot uses TCP-tunnelled audio (no raw UDP) for simplicity. Audio from other users is Opus-decoded at 24 kHz, buffered into 80 ms frames (1920 samples), and fed through the same Mimi encoder → Language Model → Mimi decoder pipeline as `moshi-sts`. The response audio is Opus-encoded and sent back as 4 × 20 ms packets per frame.
+
+### Nix Flake
+
+A `flake.nix` is provided at the repository root for reproducible development:
+```
+nix develop   # drops you into a shell with all deps
+```
+
+You still need to build/supply GGML separately and set `GGML_INCLUDE_DIR` / `GGML_LIBRARY_DIR`.
 
 # Benchmarks
 
