@@ -94,6 +94,7 @@
             pkg-config
             protobuf
             ninja
+            aria2
           ];
 
           buildInputs = with pkgs; [
